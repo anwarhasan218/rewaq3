@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - نظام تسجيل دارسي العلوم الشرعية والعربية</title>
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table th, .table td {
+            white-space: nowrap;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #1e88e5, #0d47a1);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="fs-3 fw-bold mb-0">لوحة الإدارة - نظام تسجيل دارسي العلوم الشرعية والعربية</h1>
+                <a href="index.html" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-right ml-1"></i>
+                    العودة إلى صفحة التسجيل
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-lg border-0 rounded-lg mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="fs-5 fw-bold mb-0">إحصائيات التسجيل</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="fs-4 fw-bold text-primary" id="totalStudents">0</h3>
+                                    <p class="mb-0">إجمالي المسجلين</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="fs-4 fw-bold text-primary" id="maleCount">0</h3>
+                                    <p class="mb-0">الذكور</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="fs-4 fw-bold text-primary" id="femaleCount">0</h3>
+                                    <p class="mb-0">الإناث</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="fs-4 fw-bold text-primary" id="todayCount">0</h3>
+                                    <p class="mb-0">تسجيلات اليوم</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-lg mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h2 class="fs-5 fw-bold mb-0">تصدير واستيراد البيانات</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">تصدير البيانات</h5>
+                                <button id="exportAllBtn" class="btn btn-success me-2">
+                                    <i class="fas fa-file-excel me-1"></i>
+                                    تصدير جميع البيانات (Excel)
+                                </button>
+                                <button id="exportFilteredBtn" class="btn btn-info me-2" disabled>
+                                    <i class="fas fa-filter me-1"></i>
+                                    تصدير البيانات المفلترة (Excel)
+                                </button>
+                                <button id="importExcelBtn" class="btn btn-warning me-2">
+                                    <i class="fas fa-upload me-1"></i>
+                                    استيراد بيانات من Excel
+                                </button>
+                                <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="d-none">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">استيراد البيانات</h5>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    يمكنك استيراد بيانات الدارسين من ملف Excel. يجب أن يحتوي الملف على الأعمدة التالية على الأقل: الاسم الرباعي، رقم الجلوس، الرقم القومي، المحافظة.
+                                </div>
+                                <form id="importForm" class="mb-3">
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="importFile" accept=".xlsx, .xls" required>
+                                        <button class="btn btn-primary" type="submit" id="importBtn">
+                                            <i class="fas fa-upload me-1"></i>
+                                            استيراد البيانات
+                                        </button>
+                                    </div>
+                                </form>
+                                <div class="alert alert-success d-none" id="importSuccessMessage">
+                                    تم استيراد البيانات بنجاح!
+                                </div>
+                                <div class="alert alert-danger d-none" id="importErrorMessage">
+                                    حدث خطأ أثناء استيراد البيانات. يرجى التأكد من صحة الملف والمحاولة مرة أخرى.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-lg mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="fs-5 fw-bold mb-0">فلترة البيانات</h2>
+                    </div>
+                    <div class="card-body filter-section">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="filterGovernorate" class="form-label">المحافظة</label>
+                                <select class="form-select" id="filterGovernorate">
+                                    <option value="">الكل</option>
+                                    <!-- سيتم ملء هذه القائمة ديناميكيًا -->
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="filterLevel" class="form-label">المرحلة</label>
+                                <select class="form-select" id="filterLevel">
+                                    <option value="">الكل</option>
+                                    <option value="preliminary">تمهيدية</option>
+                                    <option value="intermediate">متوسطة</option>
+                                    <option value="specialized">تخصصية</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="filterGender" class="form-label">النوع</label>
+                                <select class="form-select" id="filterGender">
+                                    <option value="">الكل</option>
+                                    <option value="male">ذكر</option>
+                                    <option value="female">أنثى</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="filterAttendance" class="form-label">نوع الدراسة</label>
+                                <select class="form-select" id="filterAttendance">
+                                    <option value="">الكل</option>
+                                    <option value="inPerson">مباشر</option>
+                                    <option value="online">عن بعد</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button id="applyFilterBtn" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i>
+                                    تطبيق الفلتر
+                                </button>
+                                <button id="resetFilterBtn" class="btn btn-secondary">
+                                    <i class="fas fa-undo me-1"></i>
+                                    إعادة ضبط
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h2 class="fs-5 fw-bold mb-0">قائمة المسجلين</h2>
+                        <div class="input-group" style="max-width: 300px;">
+                            <input type="text" class="form-control" id="searchInput" placeholder="بحث...">
+                            <button class="btn btn-light" type="button" id="searchBtn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>الاسم الرباعي</th>
+                                        <th>الرقم القومي</th>
+                                        <th>رقم الهاتف</th>
+                                        <th>النوع</th>
+                                        <th>المحافظة</th>
+                                        <th>رقم الجلوس</th>
+                                        <th>المرحلة</th>
+                                        <th>نوع الدراسة</th>
+                                        <th>تاريخ التسجيل</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody">
+                                    <!-- سيتم ملء هذا الجدول ديناميكيًا -->
+                                    <tr>
+                                        <td colspan="11" class="text-center py-4">جاري تحميل البيانات...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center mb-0" id="pagination">
+                                <!-- سيتم إنشاء أزرار الصفحات ديناميكيًا -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Student Details -->
+    <div class="modal fade" id="studentDetailsModal" tabindex="-1" aria-labelledby="studentDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="studentDetailsModalLabel">تفاصيل الطالب</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="studentDetailsContent">
+                    <!-- سيتم ملء هذا القسم ديناميكيًا -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Excel Import -->
+    <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="importExcelModalLabel">استيراد بيانات من Excel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <h6>تعليمات الاستيراد:</h6>
+                        <ul>
+                            <li>يجب أن يحتوي ملف Excel على الأعمدة التالية على الأقل: الاسم الرباعي، رقم الجلوس، الرقم القومي، المحافظة</li>
+                            <li>سيتم تحديث البيانات الموجودة إذا كان رقم الجلوس أو الرقم القومي موجودًا بالفعل</li>
+                            <li>سيتم إضافة بيانات جديدة إذا لم يكن رقم الجلوس أو الرقم القومي موجودًا</li>
+                        </ul>
+                    </div>
+                    <div class="progress mb-3 d-none" id="importProgress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div id="importResults" class="mt-3">
+                        <!-- سيتم ملء هذا القسم ديناميكيًا -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmImportBtn">استيراد البيانات</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Custom JS -->
+    <script src="supabase.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
