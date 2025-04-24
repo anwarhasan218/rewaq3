@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // Upload ID card image
                 if (idCardImage.files && idCardImage.files[0]) {
-                    const idCardResult = await window.supabaseClient.uploadFile(
+                    const idCardResult = await window.supabaseApi.uploadFile(
                         idCardImage.files[0],
                         'student-documents',
                         'id-cards'
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Upload qualification image
                 if (qualificationImageInput.files && qualificationImageInput.files[0]) {
-                    const qualificationResult = await window.supabaseClient.uploadFile(
+                    const qualificationResult = await window.supabaseApi.uploadFile(
                         qualificationImageInput.files[0],
                         'student-documents',
                         'qualifications'
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Upload payment receipt image
                 if (paymentReceiptImage.files && paymentReceiptImage.files[0]) {
-                    const paymentReceiptResult = await window.supabaseClient.uploadFile(
+                    const paymentReceiptResult = await window.supabaseApi.uploadFile(
                         paymentReceiptImage.files[0],
                         'student-documents',
                         'payment-receipts'
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.created_at = new Date().toISOString();
 
                 // Save to Supabase
-                const result = await window.supabaseClient.saveStudentData(data);
+                const result = await window.supabaseApi.saveStudentData(data);
 
                 if (!result.success) {
                     throw new Error(result.error);
