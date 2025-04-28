@@ -108,15 +108,51 @@ async function getAllStudents() {
 
         if (error) throw error;
 
+        // طباعة البيانات الأصلية بالكامل للتحقق
+        console.log('Original data from database:', data);
+        console.log('Original data columns:', data.length > 0 ? Object.keys(data[0]) : []);
+
+        // طباعة البيانات الأصلية للتحقق
+        console.log('Original data sample:', data[0]);
+        console.log('Student level exists in original data:', data[0].hasOwnProperty('student_level'));
+
         // تحويل أسماء الحقول من snake_case إلى camelCase
         const convertedData = data.map(item => {
             const converted = {};
             for (const key in item) {
+                // طباعة المفاتيح للتحقق
+                if (key === 'student_level') {
+                    console.log('Found student_level key with value:', item[key]);
+                }
+
                 // تحويل الاسم من snake_case إلى camelCase
                 const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
                 converted[camelKey] = item[key];
             }
+
+            // تأكد من وجود حقل studentLevel حتى لو كان فارغًا
+            if (!converted.hasOwnProperty('studentLevel')) {
+                console.log('studentLevel not found in converted data, adding it manually');
+                converted.studentLevel = item.student_level || '';
+            }
+
+            // إضافة قيمة افتراضية للمستوى إذا كانت فارغة
+            if (!converted.studentLevel) {
+                console.log('studentLevel is empty, setting default value');
+                converted.studentLevel = 'first';
+            }
+
             return converted;
+        });
+
+        // طباعة البيانات للتحقق
+        console.log('Converted data sample:', convertedData[0]);
+        console.log('All converted data fields:', convertedData.map(item => Object.keys(item)));
+
+        // طباعة قيم المستوى للتحقق
+        console.log('Student level values in all converted data:');
+        convertedData.forEach((item, index) => {
+            console.log(`Student ${index} (${item.fullName}): studentLevel = ${item.studentLevel}`);
         });
 
         return { success: true, data: convertedData };
@@ -215,14 +251,54 @@ function exportToCSV(students) {
         online: 'عن بعد'
     };
 
+    // طباعة البيانات للتحقق
+    console.log('Export data sample:', students[0]);
+    console.log('Student level field exists:', students[0].hasOwnProperty('studentLevel'));
+    console.log('All student fields:', Object.keys(students[0]));
+    console.log('All student values:', Object.values(students[0]));
+
+    // طباعة جميع البيانات للتحقق
+    console.log('All students data for export:', students);
+
+    // إضافة قيمة افتراضية للمستوى لجميع الطلاب
+    students.forEach(student => {
+        if (!student.studentLevel) {
+            console.log('Setting default student level for student:', student.fullName);
+            student.studentLevel = 'first';
+        }
+    });
+
     // Prepare data for Excel
     const excelData = [headers]; // First row is headers
 
     // Add data rows
     for (const student of students) {
+        // إضافة قيمة افتراضية للمستوى إذا كانت فارغة
+        if (!student.studentLevel) {
+            console.log('Student level is empty in export, setting default value for student:', student.fullName);
+            student.studentLevel = 'first';
+        }
+
         const row = headers.map(header => {
             const field = Object.keys(fieldMapping).find(key => fieldMapping[key] === header);
             let value = student[field] || '';
+
+            // طباعة قيمة المستوى للتحقق
+            if (field === 'studentLevel') {
+                console.log('Student level value:', value, 'for student:', student.fullName);
+                console.log('Student object keys:', Object.keys(student));
+                console.log('Student level property exists:', student.hasOwnProperty('studentLevel'));
+                console.log('Student level property value:', student.studentLevel);
+
+                // طباعة قيمة المستوى في البيانات الأصلية
+                console.log('Student level in original data:', student.student_level);
+
+                // إذا كانت قيمة المستوى فارغة، نضيف قيمة افتراضية للتحقق
+                if (!value) {
+                    console.log('Student level is empty, setting default value for testing');
+                    value = 'first';
+                }
+            }
 
             // Format special fields
             if (field === 'gender') {
@@ -254,7 +330,42 @@ function exportToCSV(students) {
         excelData.push(row);
     }
 
+    // طباعة البيانات المصدرة للتحقق
+    console.log('Excel data to be exported:', excelData);
+
+    // طباعة عمود المستوى للتحقق
+    const levelColumnIndex = headers.indexOf('المستوى');
+    if (levelColumnIndex !== -1) {
+        console.log('Student level column index:', levelColumnIndex);
+        console.log('Student level values in Excel:', excelData.map(row => row[levelColumnIndex]));
+
+        // التحقق من أن عمود المستوى موجود في البيانات المصدرة
+        const levelValues = excelData.map(row => row[levelColumnIndex]);
+        if (levelValues.some(value => !value || value === '')) {
+            console.log('Some student level values are empty, fixing them');
+
+            // إصلاح القيم الفارغة
+            for (let i = 1; i < excelData.length; i++) {
+                if (!excelData[i][levelColumnIndex] || excelData[i][levelColumnIndex] === '') {
+                    console.log(`Fixing empty student level value in row ${i}`);
+                    excelData[i][levelColumnIndex] = 'الأول';
+                }
+            }
+        }
+    }
+
     try {
+        // التحقق مرة أخرى من أن عمود المستوى موجود في البيانات المصدرة
+        if (levelColumnIndex !== -1) {
+            console.log('Final check for student level values before creating worksheet');
+            for (let i = 1; i < excelData.length; i++) {
+                if (!excelData[i][levelColumnIndex] || excelData[i][levelColumnIndex] === '') {
+                    console.log(`Final fix for empty student level value in row ${i}`);
+                    excelData[i][levelColumnIndex] = 'الأول';
+                }
+            }
+        }
+
         // Create a worksheet
         const ws = XLSX.utils.aoa_to_sheet(excelData);
 
@@ -291,6 +402,18 @@ function exportToCSV(students) {
         // Add the worksheet to the workbook
         XLSX.utils.book_append_sheet(wb, ws, "بيانات الطلاب");
 
+        // طباعة بيانات الورقة للتحقق
+        console.log('Worksheet data before export:', ws);
+
+        // طباعة عمود المستوى في الورقة للتحقق
+        if (levelColumnIndex !== -1) {
+            console.log('Student level column in worksheet:');
+            for (let i = 1; i < excelData.length; i++) {
+                const cellRef = XLSX.utils.encode_cell({ r: i, c: levelColumnIndex });
+                console.log(`Row ${i} student level:`, ws[cellRef]);
+            }
+        }
+
         // Generate Excel file and trigger download
         XLSX.writeFile(wb, `students_${new Date().toISOString().split('T')[0]}.xlsx`);
 
@@ -300,13 +423,23 @@ function exportToCSV(students) {
         alert('حدث خطأ أثناء تصدير الملف. يرجى المحاولة مرة أخرى.');
 
         // Fallback to CSV if Excel export fails
-        exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMap, attendanceMap);
+        exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMap, studentLevelMap, attendanceMap);
     }
 }
 
 // Fallback function to export as CSV if Excel export fails
-function exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMap, attendanceMap) {
+function exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMap, studentLevelMap, attendanceMap) {
     console.log('Falling back to CSV export');
+    console.log('CSV Export data sample:', students[0]);
+    console.log('CSV Student level field exists:', students[0].hasOwnProperty('studentLevel'));
+
+    // إضافة قيمة افتراضية للمستوى لجميع الطلاب
+    students.forEach(student => {
+        if (!student.studentLevel) {
+            console.log('Setting default student level for CSV student:', student.fullName);
+            student.studentLevel = 'first';
+        }
+    });
 
     // Format data for CSV
     const csvRows = [];
@@ -316,9 +449,32 @@ function exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMa
 
     // Add data rows
     for (const student of students) {
+        // إضافة قيمة افتراضية للمستوى إذا كانت فارغة
+        if (!student.studentLevel) {
+            console.log('CSV Student level is empty in export, setting default value for student:', student.fullName);
+            student.studentLevel = 'first';
+        }
+
         const values = headers.map(header => {
             const field = Object.keys(fieldMapping).find(key => fieldMapping[key] === header);
             let value = student[field] || '';
+
+            // طباعة قيمة المستوى للتحقق
+            if (field === 'studentLevel') {
+                console.log('CSV Student level value:', value, 'for student:', student.fullName);
+                console.log('CSV Student object keys:', Object.keys(student));
+                console.log('CSV Student level property exists:', student.hasOwnProperty('studentLevel'));
+                console.log('CSV Student level property value:', student.studentLevel);
+
+                // طباعة قيمة المستوى في البيانات الأصلية
+                console.log('CSV Student level in original data:', student.student_level);
+
+                // إذا كانت قيمة المستوى فارغة، نضيف قيمة افتراضية للتحقق
+                if (!value) {
+                    console.log('CSV Student level is empty, setting default value for testing');
+                    value = 'first';
+                }
+            }
 
             // Format special fields
             if (field === 'gender') {
@@ -356,6 +512,52 @@ function exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMa
         });
 
         csvRows.push(values.join(','));
+    }
+
+    // طباعة البيانات المصدرة للتحقق
+    console.log('CSV rows to be exported:', csvRows);
+
+    // طباعة عمود المستوى للتحقق
+    const levelColumnIndex = headers.indexOf('المستوى');
+    if (levelColumnIndex !== -1) {
+        console.log('Student level column index in CSV:', levelColumnIndex);
+        console.log('Student level values in CSV:', csvRows.map(row => {
+            const values = row.split(',');
+            return values[levelColumnIndex];
+        }));
+
+        // التحقق من أن عمود المستوى موجود في البيانات المصدرة
+        const levelValues = csvRows.map(row => {
+            const values = row.split(',');
+            return values[levelColumnIndex];
+        });
+
+        if (levelValues.some(value => !value || value === '')) {
+            console.log('Some student level values are empty in CSV, fixing them');
+
+            // إصلاح القيم الفارغة
+            for (let i = 1; i < csvRows.length; i++) {
+                const values = csvRows[i].split(',');
+                if (!values[levelColumnIndex] || values[levelColumnIndex] === '') {
+                    console.log(`Fixing empty student level value in CSV row ${i}`);
+                    values[levelColumnIndex] = 'الأول';
+                    csvRows[i] = values.join(',');
+                }
+            }
+        }
+    }
+
+    // التحقق مرة أخرى من أن عمود المستوى موجود في البيانات المصدرة
+    if (levelColumnIndex !== -1) {
+        console.log('Final check for student level values before creating CSV');
+        for (let i = 1; i < csvRows.length; i++) {
+            const values = csvRows[i].split(',');
+            if (!values[levelColumnIndex] || values[levelColumnIndex] === '') {
+                console.log(`Final fix for empty student level value in CSV row ${i}`);
+                values[levelColumnIndex] = 'الأول';
+                csvRows[i] = values.join(',');
+            }
+        }
     }
 
     // Create CSV content
@@ -452,12 +654,23 @@ async function importFromExcel(excelData, progressCallback) {
                     }
                 });
 
+                // طباعة البيانات للتحقق
+                console.log('Import student data before conversion:', cleanData);
+                console.log('Import student level exists:', cleanData.hasOwnProperty('studentLevel'));
+                console.log('Import student level value:', cleanData.studentLevel);
+
                 // Convert field names from camelCase to snake_case
                 const studentData = {};
                 for (const key in cleanData) {
                     // Convert camelCase to snake_case
                     const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
                     studentData[snakeKey] = cleanData[key];
+
+                    // طباعة المفاتيح للتحقق
+                    if (key === 'studentLevel') {
+                        console.log('Import found studentLevel key with value:', cleanData[key]);
+                        console.log('Import converted to snake_case:', snakeKey, 'with value:', studentData[snakeKey]);
+                    }
                 }
 
                 // Add or update student
@@ -532,10 +745,19 @@ async function searchStudent(searchTerm) {
 
         if (error) throw error;
 
+        // طباعة البيانات الأصلية للتحقق
+        console.log('Search original data sample:', data[0]);
+        console.log('Search student_level exists in original data:', data[0].hasOwnProperty('student_level'));
+
         // Convert snake_case to camelCase
         const convertedData = data.map(item => {
             const converted = {};
             for (const key in item) {
+                // طباعة المفاتيح للتحقق
+                if (key === 'student_level') {
+                    console.log('Search found student_level key with value:', item[key]);
+                }
+
                 // Skip file fields to avoid HTMLInputElement error
                 if (key === 'id_card_image' || key === 'qualification_image' || key === 'payment_receipt_image') {
                     // Store these as special properties that won't conflict with input IDs
@@ -548,6 +770,13 @@ async function searchStudent(searchTerm) {
                 const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
                 converted[camelKey] = item[key];
             }
+
+            // تأكد من وجود حقل studentLevel حتى لو كان فارغًا
+            if (!converted.hasOwnProperty('studentLevel')) {
+                console.log('Search studentLevel not found in converted data, adding it manually');
+                converted.studentLevel = item.student_level || '';
+            }
+
             return converted;
         });
 
@@ -580,12 +809,23 @@ async function updateStudentData(studentId, data) {
             }
         });
 
+        // طباعة البيانات للتحقق
+        console.log('Update student data before conversion:', cleanData);
+        console.log('Update student level exists:', cleanData.hasOwnProperty('studentLevel'));
+        console.log('Update student level value:', cleanData.studentLevel);
+
         // Convert camelCase to snake_case for database
         const dbData = {};
         for (const key in cleanData) {
             // Convert camelCase to snake_case
             const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
             dbData[snakeKey] = cleanData[key];
+
+            // طباعة المفاتيح للتحقق
+            if (key === 'studentLevel') {
+                console.log('Update found studentLevel key with value:', cleanData[key]);
+                console.log('Update converted to snake_case:', snakeKey, 'with value:', dbData[snakeKey]);
+            }
         }
 
         console.log('Updating student data:', dbData);
