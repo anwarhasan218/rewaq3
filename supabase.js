@@ -146,6 +146,7 @@ function exportToCSV(students) {
         'الكلية',
         'السنة الدراسية',
         'المرحلة',
+        'المستوى',
         'قسم المرحلة التخصصية',
         'المذهب',
         'نوع الدراسة',
@@ -175,6 +176,7 @@ function exportToCSV(students) {
         college: 'الكلية',
         academicYear: 'السنة الدراسية',
         level: 'المرحلة',
+        studentLevel: 'المستوى',
         specializedDepartment: 'قسم المرحلة التخصصية',
         doctrine: 'المذهب',
         attendanceSystem: 'نوع الدراسة',
@@ -199,6 +201,14 @@ function exportToCSV(students) {
         specialized: 'تخصصية'
     };
 
+    // Map student level values
+    const studentLevelMap = {
+        first: 'الأول',
+        second: 'الثاني',
+        third: 'الثالث',
+        fourth: 'الرابع'
+    };
+
     // Map attendance system values
     const attendanceMap = {
         inPerson: 'مباشر',
@@ -219,6 +229,8 @@ function exportToCSV(students) {
                 value = genderMap[value] || value;
             } else if (field === 'level') {
                 value = levelMap[value] || value;
+            } else if (field === 'studentLevel') {
+                value = studentLevelMap[value] || value;
             } else if (field === 'attendanceSystem') {
                 value = attendanceMap[value] || value;
             } else if (field === 'specialNeeds') {
@@ -313,6 +325,8 @@ function exportToCSVFallback(students, headers, fieldMapping, genderMap, levelMa
                 value = genderMap[value] || value;
             } else if (field === 'level') {
                 value = levelMap[value] || value;
+            } else if (field === 'studentLevel') {
+                value = studentLevelMap[value] || value;
             } else if (field === 'attendanceSystem') {
                 value = attendanceMap[value] || value;
             } else if (field === 'specialNeeds') {
