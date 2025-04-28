@@ -59,11 +59,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update qualification requirements
         if (selectedLevel === 'preliminary') {
             qualificationRequired.textContent = '(اختياري للمرحلة التمهيدية)';
-            qualificationImage.removeAttribute('required');
         } else {
-            qualificationRequired.textContent = '(مطلوب للمرحلة المتوسطة والتخصصية)';
-            qualificationImage.setAttribute('required', '');
+            qualificationRequired.textContent = '(اختياري للمرحلة المتوسطة والتخصصية)';
         }
+        // جعل حقل صورة المؤهل اختياري دائماً
+        qualificationImage.removeAttribute('required');
     });
 
     // Handle file preview for ID card
