@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const studentsTableBody = document.getElementById('studentsTableBody');
     const filterGovernorate = document.getElementById('filterGovernorate');
     const filterLevel = document.getElementById('filterLevel');
+    const filterStudentLevel = document.getElementById('filterStudentLevel');
     const filterGender = document.getElementById('filterGender');
     const filterAttendance = document.getElementById('filterAttendance');
     const applyFilterBtn = document.getElementById('applyFilterBtn');
@@ -230,6 +231,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 'intermediate': 'متوسطة',
                 'specialized': 'تخصصية'
             }[student.level] || student.level;
+            const studentLevelText = {
+                'first': 'الأول',
+                'second': 'الثاني',
+                'third': 'الثالث',
+                'fourth': 'الرابع'
+            }[student.studentLevel] || '-';
             const attendanceText = {
                 'inPerson': 'مباشر',
                 'online': 'عن بعد'
@@ -244,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${student.governorate || ''}</td>
                 <td>${student.seatNumber || ''}</td>
                 <td>${levelText}</td>
+                <td>${studentLevelText}</td>
                 <td>${attendanceText}</td>
                 <td>${registrationDate}</td>
                 <td>
@@ -333,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function applyFilters() {
         const governorate = filterGovernorate.value;
         const level = filterLevel.value;
+        const studentLevel = filterStudentLevel.value;
         const gender = filterGender.value;
         const attendance = filterAttendance.value;
 
@@ -340,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return (
                 (governorate === '' || student.governorate === governorate) &&
                 (level === '' || student.level === level) &&
+                (studentLevel === '' || student.studentLevel === studentLevel) &&
                 (gender === '' || student.gender === gender) &&
                 (attendance === '' || student.attendanceSystem === attendance)
             );
@@ -353,6 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetFilters() {
         filterGovernorate.value = '';
         filterLevel.value = '';
+        filterStudentLevel.value = '';
         filterGender.value = '';
         filterAttendance.value = '';
         searchInput.value = '';
@@ -394,6 +405,12 @@ document.addEventListener('DOMContentLoaded', function() {
             'intermediate': 'متوسطة',
             'specialized': 'تخصصية'
         }[student.level] || student.level;
+        const studentLevelText = {
+            'first': 'الأول',
+            'second': 'الثاني',
+            'third': 'الثالث',
+            'fourth': 'الرابع'
+        }[student.studentLevel] || '-';
         const attendanceText = {
             'inPerson': 'مباشر',
             'online': 'عن بعد'
@@ -476,6 +493,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="col-md-6 mb-3">
                     <p class="fw-bold mb-1">المرحلة:</p>
                     <p>${levelText}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <p class="fw-bold mb-1">المستوى:</p>
+                    <p>${studentLevelText}</p>
                 </div>
                 <div class="col-md-6 mb-3">
                     <p class="fw-bold mb-1">قسم المرحلة التخصصية:</p>
@@ -570,6 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'الكلية',
                 'السنة الدراسية',
                 'المرحلة',
+                'المستوى',
                 'قسم المرحلة التخصصية',
                 'المذهب',
                 'نوع الدراسة',
@@ -595,6 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'مثال: كلية الشريعة (اختياري)',
                 'مثال: الرابعة (اختياري)',
                 'اختر من: تمهيدية، متوسطة، تخصصية',
+                'اختر من: الأول، الثاني، الثالث، الرابع',
                 'مثال: فقه شافعي (للمرحلة التخصصية فقط)',
                 'اختر من: حنفي، مالكي، شافعي، حنبلي',
                 'اختر من: مباشر، عن بعد',
@@ -696,6 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'الكلية': 'college',
                         'السنة الدراسية': 'academicYear',
                         'المرحلة': 'level',
+                        'المستوى': 'studentLevel',
                         'قسم المرحلة التخصصية': 'specializedDepartment',
                         'المذهب': 'doctrine',
                         'نوع الدراسة': 'attendanceSystem',
@@ -732,6 +756,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         'specialized': 'specialized'
                     };
 
+                    // Convert student level values if needed
+                    const studentLevelMap = {
+                        'الأول': 'first',
+                        'الثاني': 'second',
+                        'الثالث': 'third',
+                        'الرابع': 'fourth',
+                        'first': 'first',
+                        'second': 'second',
+                        'third': 'third',
+                        'fourth': 'fourth'
+                    };
+
                     // Convert attendance system values if needed
                     const attendanceMap = {
                         'مباشر': 'inPerson',
@@ -757,6 +793,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     value = genderMap[value] || value;
                                 } else if (fieldName === 'level' && value) {
                                     value = levelMap[value] || value;
+                                } else if (fieldName === 'studentLevel' && value) {
+                                    value = studentLevelMap[value] || value;
                                 } else if (fieldName === 'attendanceSystem' && value) {
                                     value = attendanceMap[value] || value;
                                 } else if (fieldName === 'specialNeeds' && value) {
