@@ -177,6 +177,16 @@
                                 </select>
                             </div>
                             <div class="col-md-3 mb-3">
+                                <label for="filterStudentLevel" class="form-label">المستوى</label>
+                                <select class="form-select" id="filterStudentLevel">
+                                    <option value="">الكل</option>
+                                    <option value="first">الأول</option>
+                                    <option value="second">الثاني</option>
+                                    <option value="third">الثالث</option>
+                                    <option value="fourth">الرابع</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label for="filterGender" class="form-label">النوع</label>
                                 <select class="form-select" id="filterGender">
                                     <option value="">الكل</option>
@@ -229,6 +239,7 @@
                                         <th>المحافظة</th>
                                         <th>رقم الجلوس</th>
                                         <th>المرحلة</th>
+                                        <th>المستوى</th>
                                         <th>نوع الدراسة</th>
                                         <th>تاريخ التسجيل</th>
                                         <th>الإجراءات</th>
@@ -238,7 +249,7 @@
                                 <tbody id="studentsTableBody">
                                     <!-- سيتم ملء هذا الجدول ديناميكيًا -->
                                     <tr>
-                                        <td colspan="12" class="text-center py-4">جاري تحميل البيانات...</td>
+                                        <td colspan="13" class="text-center py-4">جاري تحميل البيانات...</td>
                                     </tr>
                                 </tbody>
                             </table>
