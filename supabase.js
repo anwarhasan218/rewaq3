@@ -51,6 +51,21 @@ async function saveStudentData(data) {
 
         console.log('البيانات المحولة:', convertedData);
 
+        // التحقق من عدم تكرار الرقم القومي قبل الإدخال
+        if (convertedData.national_id) {
+            const { data: existingStudents, error: searchError } = await supabaseClient
+                .from('students')
+                .select('id')
+                .eq('national_id', convertedData.national_id)
+                .limit(1);
+
+            if (searchError) throw searchError;
+
+            if (existingStudents && existingStudents.length > 0) {
+                throw new Error('هذا الرقم القومي مسجل بالفعل. لا يمكن تكرار التسجيل بنفس الرقم القومي.');
+            }
+        }
+
         const { data: result, error } = await supabaseClient
             .from('students')
             .insert([convertedData])
