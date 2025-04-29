@@ -737,11 +737,23 @@ async function searchStudent(searchTerm) {
             throw new Error('Supabase client not initialized');
         }
 
-        // Search by nationalId or seatNumber - use proper parameterized query to avoid SQL injection
-        const { data, error } = await supabaseClient
+        // تنظيف مصطلح البحث
+        const cleanSearchTerm = searchTerm.trim();
+        
+        // البحث بالرقم القومي أو رقم الجلوس
+        let query = supabaseClient
             .from('students')
-            .select('*')
-            .or(`national_id.eq."${searchTerm}",seat_number.eq."${searchTerm}"`);
+            .select('*');
+            
+        // إذا كان مصطلح البحث يتكون من 14 رقم، فهو على الأرجح رقم قومي
+        if (/^\d{14}$/.test(cleanSearchTerm)) {
+            query = query.eq('national_id', cleanSearchTerm);
+        } else {
+            // البحث بالرقم القومي أو رقم الجلوس
+            query = query.or(`national_id.eq."${cleanSearchTerm}",seat_number.eq."${cleanSearchTerm}"`);
+        }
+        
+        const { data, error } = await query;
 
         if (error) throw error;
 
