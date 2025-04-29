@@ -367,6 +367,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Save student data
         const saveStudent = async () => {
             try {
+                // التحقق من عدم تكرار الرقم القومي
+                if (data.nationalId) {
+                    const searchResult = await window.supabaseApi.searchStudent(data.nationalId);
+                    
+                    if (searchResult.success && searchResult.data && searchResult.data.length > 0) {
+                        // الرقم القومي موجود بالفعل
+                        throw new Error('هذا الرقم القومي مسجل بالفعل. لا يمكن تكرار التسجيل بنفس الرقم القومي.');
+                    }
+                }
+                
                 // Upload files
                 const uploadResult = await uploadFiles(data);
 
@@ -399,6 +409,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show success message
                 successMessage.textContent = 'تم تسجيل البيانات بنجاح!';
                 successMessage.classList.remove('d-none');
+                
+                // التمرير إلى رسالة النجاح
+                successMessage.scrollIntoView({ behavior: 'smooth' });
 
                 // Reset form
                 resetForm();
